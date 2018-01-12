@@ -1,3 +1,9 @@
+var mongo = require('mongodb').MongoClient;
+var url = 'mongodb://localhost/test';
+
+/* mongo.connect(url, function(err, db) {
+  if(err) throw err;
+}); */
 
 const TeleBot = require('telebot');
 
@@ -54,6 +60,18 @@ bot.on(/^([Hh]oe.*\?+|[Ww]a+rom.*\?+)/, function (msg) {
   return bot.sendMessage(msg.from.id, ans[random(6)]);
 });
 
+bot.on(/[Ii]k ben ([0-9][0-9]?)\.? ?j?a?a?r? ?o?u?d?.?/, function (msg, props) {
+  const leeftijd = props.match[1];
+  var ans = ["Cool", "Ik ben 3 maanden oud!", "Ok"]
+  senddata(msg.from.first_name, leeftijd)
+  return bot.sendMessage(msg.from.id, ans[random(3)]);
+});
+
+bot.on(/[Hh]oe oud ben ik\??/, function (msg, props) {
+  const leeftijd = props.match[1];
+  return bot.sendMessage(msg.from.id, getdata(msg.from.first_name));
+});
+
 bot.on(/(.+)/, function (msg, props) {
   lastmsg = props.match[1];
   console.log(msg.from.first_name + " " + msg.from.last_name + ": " + lastmsg);
@@ -63,6 +81,33 @@ bot.on(/(.+)/, function (msg, props) {
 
 function random(aantal) {
   return Math.floor(Math.random() * aantal);
+}
+
+function getdata(naam) {
+  mongo.connect(url, function(err, db) {
+    db.db("test").collection('users').findOne({ "name" : naam}, function (err, result) {
+      var bericht;
+      if (err) throw (err);
+      db.close();
+      if (!result) {
+        bericht = "Dat heb je me nog niet verteld"
+      } else {
+        bericht = result.naam + " " + result.score
+      }
+      return result.name;
+    });
+  });
+}
+
+function senddata(naam, hoeoud) {
+  mongo.connect(url, function(err, db) {
+    db.db("test").collection('users').insertOne({
+      "name": naam,
+      "leeftijd": hoeoud
+    });
+    db.close();
+  });
+  console.log("[database] added: " + naam + ", " + hoeoud)
 }
 
 bot.start();
