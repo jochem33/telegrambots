@@ -1,10 +1,6 @@
 var mongo = require('mongodb').MongoClient;
 var url = 'mongodb://localhost/test';
 
-/* mongo.connect(url, function(err, db) {
-  if(err) throw err;
-}); */
-
 const TeleBot = require('telebot');
 
 const bot = new TeleBot('508978429:AAHcNczEHomrFMLKGmF23WpDbfwy1WBQQs4');
@@ -56,20 +52,21 @@ bot.on(/^[Dd]oei/, function (msg) {
 });
 
 bot.on(/^([Hh]oe.*\?+|[Ww]a+rom.*\?+)/, function (msg) {
-  var ans = ["Ik weet het niet", "Ik begrijp de vraag niet zo goed", "??", msg.from.first_name + " je moet echt wat duidelijker zijn", "Ik heb geen idee"]
+  var ans = ["Ik weet het niet", "Ik begrijp de vraag niet zo goed", "??", "Ik heb geen idee"]
   return bot.sendMessage(msg.from.id, ans[random(6)]);
 });
 
-bot.on(/[Ii]k ben ([0-9][0-9]?)\.? ?j?a?a?r? ?o?u?d?.?/, function (msg, props) {
-  const leeftijd = props.match[1];
+bot.on(/ik ben ([0-9][0-9])/, function (msg, props) {
+  var leeftijd = props.match[1];
+  console.log(props.match)
   var ans = ["Cool", "Ik ben 3 maanden oud!", "Ok"]
   senddata(msg.from.first_name, leeftijd)
   return bot.sendMessage(msg.from.id, ans[random(3)]);
 });
 
-bot.on(/[Hh]oe oud ben ik\??/, function (msg, props) {
-  const leeftijd = props.match[1];
-  return bot.sendMessage(msg.from.id, getdata(msg.from.first_name));
+bot.on(/[Hh]oe oud ben ik\??/, function (msg) {
+  var naam = toString(msg.from.first_name);
+  return bot.sendMessage(msg.from.id, "je bent " + getdata(naam) + " jaar oud.");
 });
 
 bot.on(/(.+)/, function (msg, props) {
@@ -92,9 +89,9 @@ function getdata(naam) {
       if (!result) {
         bericht = "Dat heb je me nog niet verteld"
       } else {
-        bericht = result.naam + " " + result.score
+        bericht = result.name + " " + result.score
       }
-      return result.name;
+      return bericht;
     });
   });
 }
