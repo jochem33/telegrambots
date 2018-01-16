@@ -25,7 +25,7 @@ bot.on('/start', function (msg) {
 });
 
 bot.on('/wiebenje', function (msg) {
-  return bot.sendMessage(msg.from.id, "Hoi, ik ben Hakan", {replyToMessage: msg.message_id, notification: false});
+  return bot.sendMessage(msg.from.id, "Hoi, ik ben een telegram bot met de naam Jochembot!", {replyToMessage: msg.message_id, notification: false});
 });
 
 bot.on('/foto', function (msg) {
@@ -72,7 +72,7 @@ bot.on(/[Hh]oe oud ben ik\??/, function (msg) {
   setTimeout(function(){
     console.log("in regex leeftijd is: " + leeftijd);
     return bot.sendMessage(msg.from.id, "je bent " + leeftijd + " jaar oud.");
-  }, 3000);
+  }, 300);
 });
 
 bot.on(/(.+)/, function (msg, props) {
