@@ -7,6 +7,8 @@ const bot = new TeleBot('508978429:AAHcNczEHomrFMLKGmF23WpDbfwy1WBQQs4');
 
 var lastmsg;
 
+var leeftijd;
+
 var date = new Date();
 var uur = date.getHours();
 var goedemorgen = "goedendag";
@@ -53,20 +55,24 @@ bot.on(/^[Dd]oei/, function (msg) {
 
 bot.on(/^([Hh]oe.*\?+|[Ww]a+rom.*\?+)/, function (msg) {
   var ans = ["Ik weet het niet", "Ik begrijp de vraag niet zo goed", "??", "Ik heb geen idee"]
-  return bot.sendMessage(msg.from.id, ans[random(6)]);
+  return bot.sendMessage(msg.from.id, ans[random(4)]);
 });
 
-bot.on(/ik ben ([0-9][0-9])/, function (msg, props) {
+bot.on(/[Ii]k ben ([0-9][0-9])/, function (msg, props) {
   var leeftijd = props.match[1];
-  console.log(props.match)
-  var ans = ["Cool", "Ik ben 3 maanden oud!", "Ok"]
-  senddata(msg.from.first_name, leeftijd)
+  var ans = ["Ok", "cool", "Oké, ik ben nog niet zo oud."];
+  senddata(msg.from.first_name, leeftijd[7] + leeftijd[8])
   return bot.sendMessage(msg.from.id, ans[random(3)]);
 });
 
 bot.on(/[Hh]oe oud ben ik\??/, function (msg) {
-  var naam = toString(msg.from.first_name);
-  return bot.sendMessage(msg.from.id, "je bent " + getdata(naam) + " jaar oud.");
+  var naam = msg.from.first_name;
+  getdata(naam);
+  //leeftijd = getdata(msg.from.first_name);
+  setTimeout(function(){
+    console.log("in regex leeftijd is: " + leeftijd);
+    return bot.sendMessage(msg.from.id, "je bent " + leeftijd + " jaar oud.");
+  }, 3000);
 });
 
 bot.on(/(.+)/, function (msg, props) {
@@ -83,15 +89,18 @@ function random(aantal) {
 function getdata(naam) {
   mongo.connect(url, function(err, db) {
     db.db("test").collection('users').findOne({ "name" : naam}, function (err, result) {
-      var bericht;
       if (err) throw (err);
       db.close();
       if (!result) {
-        bericht = "Dat heb je me nog niet verteld"
+        leeftijd = 0;
+        console.log("[database] user " + naam + " not found!")
+        return 0;
       } else {
-        bericht = result.name + " " + result.score
+        leeftijd = result.leeftijd;
+        console.log("[database] found: " + naam + ", " + leeftijd);
+        console.log(leeftijd + " otto")
+        return result.leeftijd;
       }
-      return bericht;
     });
   });
 }
