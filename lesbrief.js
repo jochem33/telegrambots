@@ -7,6 +7,9 @@ const bot = new TeleBot('508978429:AAHcNczEHomrFMLKGmF23WpDbfwy1WBQQs4');
 
 var answer;
 var lastmsg;
+var lastlastmsg;
+var ansid;
+var lastansid;
 
 var leeftijd;
 
@@ -22,14 +25,37 @@ if (uur < 13 || uur > 4) {
 }
 
 bot.on('/start', function (msg) {
-  answer = "Hallo " + msg.from.first_name;
+  ansid = "HOEGAAT";
+  answer = "Hallo " + msg.from.first_name + ", hoe gaat het?";
 });
 
-bot.on('/wiebenje', function (msg) {
+bot.on(/[Gg]oed|[Pp]rima|[Zz]\'?n gang|[Zz]\'?n gangetje|[Kk]an beter|[Hh]et had beter gekund!?/, function (msg) {
+  if(ansid == "HOEGAAT") {
+    answer = "fijn, met mij gaat het ook goed.";
+  } else {
+    answer = "Wat is er goed?";
+  }
+});
+
+bot.on(/[Ss]lecht!?|[Mm]atig|[Nn]iet z?o? ?goed!?/, function (msg) {
+  if(ansid == "HOEGAAT") {
+    answer = "Dat is jammer.";
+  } else {
+    answer = "hmmmm";
+  }
+});
+
+bot.on(/(in bed)$/, function (msg) {
+  ansid = "INBED";
+  answer = "pret";
+});
+
+bot.on(/\/wiebenje|[Ww]ie ben je\??|[Ww]at ben je\??/, function (msg) {
+  ansid = "WIE";
   answer = "Hoi, ik ben een telegram bot met de naam Jochembot!";
 });
 
-bot.on('/foto', function (msg) {
+bot.on(/\/foto|[Kk]an je m[ei]j? een foto sturen\??|[Kk]an je m[ei]j? een foto geven\??|[Gg]eef mij een foto\??|[Ss]tuur mij een foto!?/, function (msg) {
   return bot.sendPhoto(msg.from.id, "images/splash.jpg");
 });
 
@@ -38,7 +64,7 @@ bot.on('/versie', function (msg) {
 });
 
 bot.on(/^([hH][oai]+i|[Hh]allo!*|[Gg]oe[id]emorgen!*|[Hh]i+)/, function (msg) {
-  var hoi = ["Hoi", "Hallo", "Goedendag", goedemorgen, "Hoi " + msg.from.first_name, "Hallo " + msg.from.first_name, "Goedendag " + msg.from.first_name, goedemorgen  + msg.from.first_name]
+  var hoi = ["Hoi", "Hallo", "Goedendag", goedemorgen, "Hoi " + msg.from.first_name, "Hallo " + msg.from.first_name, "Goedendag " + msg.from.first_name, goedemorgen + " " + msg.from.first_name]
   answer = hoi[random(8)];
 });
 
@@ -56,7 +82,7 @@ bot.on(/[Hh]oe is het\??|[Hh][Gg][Hh]\??|[Hh]oe gaat het\?? ?e?r? ?m?e?e?\??|[Aa
   answer = hoi[random(8)];
 });
 
-bot.on(/\/tijd|[Hh]oe laat is het ?n?u?[\?]?/, function (msg) {
+bot.on(/\/tijd|[Hh]oe ?laat is het ?n?u?[\?]?/, function (msg) {
   uren = date.getHours();
   if (uren > 12) {
     uren -= 12;
@@ -82,6 +108,8 @@ bot.on(/[Hh]oe oud ben ik\??/, function (msg) {
 });
 
 bot.on(/(.+)/, function (msg, props) {
+  lastansid = ansid;
+  lastlastmsg = lastmsg;
   lastmsg = props.match[1];
   setTimeout(function(){
     console.log(msg.from.first_name + " " + msg.from.last_name + ": " + lastmsg);
