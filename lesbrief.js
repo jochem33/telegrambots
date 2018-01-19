@@ -29,17 +29,29 @@ bot.on('/start', function (msg) {
   answer = "Hallo " + msg.from.first_name + ", hoe gaat het?";
 });
 
-bot.on(/[Gg]oed|[Pp]rima|[Zz]\'?n gang|[Zz]\'?n gangetje|[Kk]an beter|[Hh]et had beter gekund!?/, function (msg) {
-  if(ansid == "HOEGAAT") {
+bot.on(/[Gg]oed|[Pp]rima|[Zz]\'?n gang|[Zz]\'?n gangetje/, function (msg) {
+  if(ansid == "HOEGAAT")
+    ansid = "MIJOOKGOED";
     answer = "fijn, met mij gaat het ook goed.";
+  } else if(ansid = "MIJOOKGOED") {
+    answer = "top";
   } else {
     answer = "Wat is er goed?";
   }
 });
 
-bot.on(/[Ss]lecht!?|[Mm]atig|[Nn]iet z?o? ?goed!?/, function (msg) {
+bot.on(/[Ss]lecht!?|[Mm]atig|[Nn]iet z?o? ?goed!?|[Kk]an beter|[Hh]et had beter gekund!?/, function (msg) {
   if(ansid == "HOEGAAT") {
+    ansid = "SLECHTJAMMER";
     answer = "Dat is jammer.";
+  } else {
+    answer = "hmmmm";
+  }
+});
+
+bot.on(/[Jj]a!?|[Ii][Dd][Dd]!?|[Ii]nderdaad!?/, function (msg) {
+  if(ansid == "SLECHTJAMMER") {
+    answer = "ok";
   } else {
     answer = "hmmmm";
   }
@@ -119,6 +131,17 @@ bot.on(/(.+)/, function (msg, props) {
 });
 
 
+
+function sendconversation(name, bot, user) {
+  mongo.connect(url, function(err, db) {
+    db.db("test").collection('conversations').insertOne({
+      "name": name,
+      "bot": bot,
+      "user": user
+    });
+    db.close();
+  });
+}
 
 function random(aantal) {
   return Math.floor(Math.random() * aantal);
