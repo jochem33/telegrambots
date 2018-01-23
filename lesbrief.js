@@ -30,13 +30,22 @@ bot.on('/start', function (msg) {
 });
 
 bot.on(/[Gg]oed|[Pp]rima|[Zz]\'?n gang|[Zz]\'?n gangetje/, function (msg) {
-  if(ansid == "HOEGAAT")
+  if(ansid == "HOEGAAT") {
     ansid = "MIJOOKGOED";
     answer = "fijn, met mij gaat het ook goed.";
   } else if(ansid = "MIJOOKGOED") {
     answer = "top";
   } else {
     answer = "Wat is er goed?";
+  }
+});
+
+bot.on(/[Oo]Kk|[Ff]ijn/, function (msg) {
+  if(ansid == "MIJOOKGOED") {
+    //ansid = "";
+    answer = "Dipp";
+  } else {
+    answer = "hmmmm";
   }
 });
 
@@ -90,7 +99,7 @@ bot.on(/^([Hh]oe.*\?+|[Ww]a+rom.*\?+)/, function (msg, props) {
 });
 
 bot.on(/[Hh]oe is het\??|[Hh][Gg][Hh]\??|[Hh]oe gaat het\?? ?e?r? ?m?e?e?\??|[Aa]lles goed\??/, function (msg) {
-  var hoi = ["Goed", "Prima", "Normaal", "Z'n gangetje", "Goed, en met jou?", "Prima, en met jou?", "Z'n gengetje, en jij?"]
+  var hoi = ["Goed", "Prima", "Normaal", "Goed, en met jou?", "Prima, en met jou?"]
   answer = hoi[random(8)];
 });
 
@@ -119,6 +128,11 @@ bot.on(/[Hh]oe oud ben ik\??/, function (msg) {
   }, 200);
 });
 
+bot.on(/\/?[Ss]top|[Hh]ou op!?/, function (msg) {
+  ansid = "STOP";
+  answer = "Ok";
+});
+
 bot.on(/(.+)/, function (msg, props) {
   lastansid = ansid;
   lastlastmsg = lastmsg;
@@ -128,14 +142,16 @@ bot.on(/(.+)/, function (msg, props) {
     console.log("Bot: " + answer)
     return bot.sendMessage(msg.from.id, answer);
   }, 300);
+  sendconversation(msg.from.first_name + " " + msg.from.last_name, msg.from.id, answer, lastmsg);
 });
 
 
 
-function sendconversation(name, bot, user) {
+function sendconversation(name, id, bot, user) {
   mongo.connect(url, function(err, db) {
     db.db("test").collection('conversations').insertOne({
       "name": name,
+      "id": id,
       "bot": bot,
       "user": user
     });
