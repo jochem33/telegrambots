@@ -13,21 +13,31 @@ var lastansid;
 
 var leeftijd;
 
-var date = new Date();
-var uur = date.getHours();
-var goedemorgen = "goedendag";
-if (uur < 13 || uur > 4) {
-  goedemorgen = "goeiemorgen";
-} else if (uur > 12 && uur < 17) {
-  goedemorgen = "goeiemiddag";
-} else if (uur > 16 || uur < 5) {
-  goedemorgen = "goeienavond";
+woordenlijst = ["ijs", "pizza", "telegram"];
+
+woord = woordenlijst[random(3)];
+geradenletters = [];
+foutgeradenletters= [];
+aantalletters = woord.lenght;
+for (i = 0; i < aantalletters; i++) {
+  geradenletters.push("_");
 }
 
 bot.on('/start', function (msg) {
   answer = "Raad een letter!";
-  return bot.sendMessage(msg.from.id, "Hallo " + msg.from.first_name + "Welkom bij galgje");
+  return bot.sendMessage(msg.from.id, "Hallo " + msg.from.first_name + " welkom bij galgje");
 });
+
+bot.on(/^([a-zA-Z])$/), function (msg, props) {
+  geradenletter = props.match(1);
+  var woordinletter = woord.indexOf(geradenletter);
+  if(woordinletter != -1){
+    geradenletters[woordinletter] = geradenletter;
+    answer = "goedzo, je hebt een letter geraden!";
+  } else {
+    answer = "jammer, probeer het nog een keer";
+  }
+}
 
 bot.on(/(.+)/, function (msg, props) {
   lastansid = ansid;
@@ -38,7 +48,7 @@ bot.on(/(.+)/, function (msg, props) {
     console.log("Bot: " + answer)
     return bot.sendMessage(msg.from.id, answer);
   }, 300);
-  sendconversation(msg.from.first_name + " " + msg.from.last_name, msg.from.id, answer, lastmsg);
+  //sendconversation(msg.from.first_name + " " + msg.from.last_name, msg.from.id, answer, lastmsg);
 });
 
 
