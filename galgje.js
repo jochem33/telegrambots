@@ -5,8 +5,8 @@ const TeleBot = require('telebot');
 
 const bot = new TeleBot('508978429:AAHcNczEHomrFMLKGmF23WpDbfwy1WBQQs4');
 
-var answer = "Aaaaaaa";
-var answer2;
+var answer2 = "Hallo, welkom bij galgje";
+var answer = "Raad een letter!";
 var lastlastmsg;
 var ansid;
 var lastansid;
@@ -72,12 +72,23 @@ function voortgang() {
 }
 
 bot.on('/start', function (msg) {
+  woord = woordenlijst[random(3)];
+  geradenletter = 0;
+  geradendezebeurt;
+  geradenletters = [];
+  foutgeradenletters = [];
+  foutgeraden = 0;
+  aantalletters = woord.length;
+  for (i = 0; i < aantalletters; i++) {
+    geradenletters.push("_");
+  }
+
   answer = "Raad een letter!";
-  answer2 = "Hallo " + msg.from.first_name + " welkom bij galgje";
+  answer2 = "Hallo " + msg.from.first_name + ", welkom bij galgje";
 });
 
 
-bot.on(/^[a-zA-Z]$/, function (msg, props) {
+bot.on(/^[a-z]$/, function (msg, props) {
   geradendezebeurt = 0;
   geradenletter = props.match[1];
   console.log("letter geraden")
@@ -98,17 +109,11 @@ bot.on(/^[a-zA-Z]$/, function (msg, props) {
     answer = "Gefeliciteerd, je hebt het woord geraden, het was inderdaad " + woord;
     answer2 = "";
   }
-  /*
-  var woordinletter = woord.indexOf(geradenletter);
-  if(woordinletter >= 0){
-    geradenletters[woordinletter] = geradenletter;
-    answer = "Goedzo, je hebt een letter geraden!";
-  } else {
-    foutgeradenletters.push(geradenletter);
-    foutgeraden++;
-    answer = "Jammer, probeer het nog een keer";
-  }*/
   voortgang();
+});
+
+bot.on(/[A-Z0-9]/, function (msg, props) {
+  answer = "Je kan geen getallen en alleen kleine letters raden."
 });
 
 bot.on(/(.+)/, function (msg, props) {
