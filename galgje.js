@@ -5,8 +5,8 @@ const TeleBot = require('telebot');
 
 const bot = new TeleBot('508978429:AAHcNczEHomrFMLKGmF23WpDbfwy1WBQQs4');
 
-var answer = "Knibbel Knabbel Knuisje";
-var answer2 = voortgang();
+var answer = "Aaaaaaa";
+var answer2;
 var lastlastmsg;
 var ansid;
 var lastansid;
@@ -17,26 +17,28 @@ woordenlijst = ["ijs", "pizza", "telegram"];
 
 var woord = woordenlijst[random(3)];
 var geradenletter;
+var moetnograden;
+var geradendezebeurt;
 var geradenletters = [];
 var foutgeradenletters = [];
 var foutgeraden = 0;
-var aantalletters = woord.lenght;
+var aantalletters = woord.length;
 for (i = 0; i < aantalletters; i++) {
   geradenletters.push("_");
 }
 
 function voortgang() {
   if (foutgeraden == 0){
-    answer = "________";
+    answer2 = "________";
   }
   if (foutgeraden == 1){
-    answer = " |\n |\n |\n |\n |\n |\n________";
+    answer2 = "  |\n |\n |\n |\n |\n |\n________";
   }
   if (foutgeraden == 2){
-    answer = "________\n |/\n |\n |\n |\n |\n |\n________";
+    answer2 = "________\n |/\n |\n |\n |\n |\n |\n________";
   }
   if (foutgeraden == 3){
-    answer = "________" +
+    answer2 = "________" +
             "\n |/" +
             "\n |" +
             "\n |" +
@@ -46,7 +48,7 @@ function voortgang() {
             "\n________";
   }
   if (foutgeraden == 4){
-    answer = "________" +
+    answer2 = "________" +
             "\n |/     |" +
             "\n |     ( )" +
             "\n |" +
@@ -56,7 +58,7 @@ function voortgang() {
             "\n________";
   }
   if (foutgeraden == 5){
-    answer = "________" +
+    answer2 = "________" +
             "\n |/     |" +
             "\n |     ( )" +
             "\n |     /|\\" +
@@ -65,17 +67,38 @@ function voortgang() {
             "\n |" +
             "\n________";
   }
-  return(answer);
+  answer2 = answer2 + "\n" + foutgeradenletters + "\n" + geradenletters;
+  return(answer2);
 }
 
 bot.on('/start', function (msg) {
   answer = "Raad een letter!";
-  return bot.sendMessage(msg.from.id, "Hallo " + msg.from.first_name + " welkom bij galgje");
+  answer2 = "Hallo " + msg.from.first_name + " welkom bij galgje";
 });
 
 
-bot.on(/[aA]//*^([a-zA-Z])$*/), function (msg, props) {
-  geradenletter = "h"; //props.match(1);
+bot.on(/^[a-zA-Z]$/, function (msg, props) {
+  geradendezebeurt = 0;
+  geradenletter = props.match[1];
+  console.log("letter geraden")
+  for (i = 0; i < aantalletters; i++) {
+    if (geradenletter == woord[i]) {
+      geradenletters[i] = geradenletter;
+      answer = "Goedzo, je hebt een letter geraden!";
+      geradendezebeurt++;
+    }
+  }
+  if (geradendezebeurt == 0) {
+    foutgeradenletters.push(geradenletter);
+    foutgeraden++;
+    answer = "Jammer, probeer het nog een keer";
+  }
+  moetnograden = geradenletters.indexOf("_");
+  if (moetnograden == -1) {
+    answer = "Gefeliciteerd, je hebt het woord geraden, het was inderdaad " + woord;
+    answer2 = "";
+  }
+  /*
   var woordinletter = woord.indexOf(geradenletter);
   if(woordinletter >= 0){
     geradenletters[woordinletter] = geradenletter;
@@ -84,10 +107,9 @@ bot.on(/[aA]//*^([a-zA-Z])$*/), function (msg, props) {
     foutgeradenletters.push(geradenletter);
     foutgeraden++;
     answer = "Jammer, probeer het nog een keer";
-    answer2 = voortgang();
-  }
-  return bot.sendMessage(msg.from.id, "H ");
-}
+  }*/
+  voortgang();
+});
 
 bot.on(/(.+)/, function (msg, props) {
   lastmsg = props.match[1];
@@ -103,52 +125,9 @@ bot.on(/(.+)/, function (msg, props) {
   return bot.sendMessage(msg.from.id, answer2)
 });
 
-
-
-function sendconversation(name, id, bot, user) {
-  mongo.connect(url, function(err, db) {
-    db.db("test").collection('conversations').insertOne({
-      "name": name,
-      "id": id,
-      "bot": bot,
-      "user": user
-    });
-    db.close();
-  });
-}
-
 function random(aantal) {
   return Math.floor(Math.random() * aantal);
 }
 
-function getdata(naam) {
-  mongo.connect(url, function(err, db) {
-    db.db("test").collection('users').findOne({ "name" : naam}, function (err, result) {
-      if (err) throw (err);
-      db.close();
-      if (!result) {
-        leeftijd = 0;
-        console.log("[database] user " + naam + " not found!")
-        return 0;
-      } else {
-        leeftijd = result.leeftijd;
-        console.log("[database] found: " + naam + ", " + leeftijd);
-        console.log(leeftijd + " otto")
-        return result.leeftijd;
-      }
-    });
-  });
-}
-
-function senddata(naam, hoeoud) {
-  mongo.connect(url, function(err, db) {
-    db.db("test").collection('users').insertOne({
-      "name": naam,
-      "leeftijd": hoeoud
-    });
-    db.close();
-  });
-  console.log("[database] added: " + naam + ", " + hoeoud)
-}
 
 bot.start();
